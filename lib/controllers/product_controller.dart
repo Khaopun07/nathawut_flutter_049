@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_mongo_lab1/varibles.dart';
-import 'package:flutter_mongo_lab1/models/product_model.dart';
+import 'package:natthawut_flutter_049/varibles.dart';
+import 'package:natthawut_flutter_049/models/product_model.dart';
 import 'package:http/http.dart' as http;
 
 class ProductController {

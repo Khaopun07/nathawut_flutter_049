@@ -2,10 +2,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter_mongo_lab1/Page/home_screen.dart';
-import 'package:flutter_mongo_lab1/Page/register.dart';
-import 'package:flutter_mongo_lab1/Widget/customCliper.dart';
-import 'package:flutter_mongo_lab1/controllers/auth_controller.dart';
+import 'package:natthawut_flutter_049/Page/home_screen.dart';
+import 'package:natthawut_flutter_049/Page/register.dart';
+import 'package:natthawut_flutter_049/Widget/customCliper.dart';
+import 'package:natthawut_flutter_049/controllers/auth_controller.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);

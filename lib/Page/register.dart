@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mongo_lab1/Page/login_screen.dart';
-import 'package:flutter_mongo_lab1/Widget/customCliper.dart';
+import 'package:natthawut_flutter_049/Page/login_screen.dart';
+import 'package:natthawut_flutter_049/Widget/customCliper.dart';
 import 'dart:math';
-import 'package:flutter_mongo_lab1/controllers/auth_controller.dart';
+import 'package:natthawut_flutter_049/controllers/auth_controller.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);

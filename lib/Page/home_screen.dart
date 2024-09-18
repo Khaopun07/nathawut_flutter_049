@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'package:flutter_mongo_lab1/Widget/customCliper.dart';
+import 'package:natthawut_flutter_049/Widget/customCliper.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

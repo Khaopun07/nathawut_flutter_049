@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'package:flutter_mongo_lab1/Widget/customCliper.dart'; // Assuming you already have customClipper
+import 'package:natthawut_flutter_049/Widget/customCliper.dart'; // Assuming you already have customClipper
 
 class AddProductPage extends StatefulWidget {
   @override
