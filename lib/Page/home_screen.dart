@@ -50,6 +50,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       body: Container(
         height: height,
+        color: Color(0xFFA2D5AB), // สีพื้นหลังเขียว
         child: Stack(
           children: [
             // Background
@@ -68,8 +69,8 @@ class HomeScreen extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Color(0xffE6E6E6),
-                          Color(0xff14279B),
+                          Color(0xFFA2D5AB), // สีเขียวธีม
+                          Color(0xFF2F5233), // สีเขียวเข้ม
                         ],
                       ),
                     ),
@@ -91,13 +92,13 @@ class HomeScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 35,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xff14279B),
+                          color: Color(0xFF2F5233), // ใช้สีเขียวเข้ม
                         ),
                         children: [
                           TextSpan(
                             text: 'สินค้า',
                             style: TextStyle(
-                                color: Color(0xff021526), fontSize: 35),
+                                color: Colors.black, fontSize: 35),
                           ),
                         ],
                       ),
@@ -111,7 +112,7 @@ class HomeScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             border: Border(
                               bottom: BorderSide(
-                                color: Color.fromARGB(255, 225, 215, 183),
+                                color: Color(0xFFE5E5E5),
                                 width: 1.0,
                               ),
                             ),
@@ -139,16 +140,14 @@ class HomeScreen extends StatelessWidget {
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
-                                              color: Color.fromARGB(
-                                                  255, 30, 42, 94)),
+                                              color: Color(0xFF2F5233)), // ใช้สีเขียวเข้ม
                                         ),
                                         SizedBox(height: 4),
                                         Text(
                                           products[index]['price']!,
                                           style: TextStyle(
                                               fontSize: 16,
-                                              color: Color.fromARGB(
-                                                  255, 0, 100, 251)),
+                                              color: Colors.green),
                                         ),
                                       ],
                                     ),
@@ -161,7 +160,7 @@ class HomeScreen extends StatelessWidget {
                                 child: ElevatedButton(
                                   onPressed: () {},
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
+                                    backgroundColor: Colors.green, // ปุ่มสีเขียว
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                     ),

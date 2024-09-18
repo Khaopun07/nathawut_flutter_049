@@ -44,6 +44,7 @@ class _EditProductPageState extends State<EditProductPage> {
     return Scaffold(
       body: Container(
         height: height,
+        color: Color(0xFFA2D5AB), // สีพื้นหลังธีมเขียว
         child: Stack(
           children: [
             // Background
@@ -62,8 +63,8 @@ class _EditProductPageState extends State<EditProductPage> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Color(0xffE9EFEC),
-                          Color(0xffFABC3F),
+                          Color(0xFFA2D5AB), // สีเขียวหลัก
+                          Color(0xFF2F5233), // สีเขียวเข้ม
                         ],
                       ),
                     ),
@@ -85,13 +86,15 @@ class _EditProductPageState extends State<EditProductPage> {
                         style: TextStyle(
                           fontSize: 35,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xffC7253E),
+                          color: Color(0xFF2F5233), // สีเขียวเข้ม
                         ),
                         children: [
                           TextSpan(
                             text: 'สินค้า',
                             style: TextStyle(
-                                color: Color(0xffE85C0D), fontSize: 35),
+                              color: Colors.black,
+                              fontSize: 35,
+                            ),
                           ),
                         ],
                       ),
@@ -130,7 +133,7 @@ class _EditProductPageState extends State<EditProductPage> {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xff821131),
+                              backgroundColor: Color(0xFF2F5233), // สีเขียวเข้ม
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),

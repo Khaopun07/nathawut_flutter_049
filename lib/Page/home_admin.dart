@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:natthawut_flutter_049/Widget/customCliper.dart';
+import 'package:provider/provider.dart';
 
 class HomeAdmin extends StatelessWidget {
   const HomeAdmin({super.key});
@@ -73,6 +74,7 @@ class HomeAdmin extends StatelessWidget {
     return Scaffold(
       body: Container(
         height: height,
+        color: Color(0xFFA2D5AB), // สีพื้นหลังธีมเขียว
         child: Stack(
           children: [
             // Background
@@ -91,8 +93,8 @@ class HomeAdmin extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Color(0xffE9EFEC),
-                          Color(0xffFABC3F),
+                          Color(0xFFA2D5AB), // สีพื้นหลังธีม
+                          Color(0xFF2F5233), // สีเขียวเข้ม
                         ],
                       ),
                     ),
@@ -114,13 +116,13 @@ class HomeAdmin extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 35,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xffC7253E),
+                          color: Color(0xFF2F5233), // สีเขียวเข้ม
                         ),
                         children: [
                           TextSpan(
                             text: 'สินค้า',
                             style: TextStyle(
-                                color: Color(0xffE85C0D), fontSize: 35),
+                                color: Colors.black, fontSize: 35),
                           ),
                         ],
                       ),
@@ -132,7 +134,7 @@ class HomeAdmin extends StatelessWidget {
                         Navigator.pushNamed(context, '/add_product');
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xff821131),
+                        backgroundColor: const Color(0xFF2F5233), // สีเขียวเข้ม
                       ),
                       child: Text(
                         'เพิ่มสินค้าใหม่',
@@ -148,7 +150,7 @@ class HomeAdmin extends StatelessWidget {
                           decoration: BoxDecoration(
                             border: Border(
                               bottom: BorderSide(
-                                color: Color.fromARGB(255, 225, 215, 183),
+                                color: Color(0xFFE5E5E5), // เส้นคั่น
                                 width: 1.0,
                               ),
                             ),
@@ -165,7 +167,7 @@ class HomeAdmin extends StatelessWidget {
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xffC7253E)),
+                                          color: Color(0xFF2F5233)), // สีเขียวเข้ม
                                     ),
                                     Text(
                                       'ประเภท: ${products[index]['productType']}',
@@ -194,7 +196,7 @@ class HomeAdmin extends StatelessWidget {
                               IconButton(
                                 icon: Icon(
                                   Icons.edit,
-                                  color: Color(0xffFABC3F),
+                                  color: Color(0xFF2F5233), // สีเขียวเข้ม
                                 ),
                                 onPressed: () {
                                   Navigator.pushNamed(
@@ -207,7 +209,7 @@ class HomeAdmin extends StatelessWidget {
                               IconButton(
                                 icon: Icon(
                                   Icons.delete,
-                                  color: Color(0xff821131),
+                                  color: Colors.red, // สีแดงสำหรับลบ
                                 ),
                                 onPressed: () {
                                   // Handle delete functionality
@@ -235,7 +237,7 @@ class HomeAdmin extends StatelessWidget {
                 },
                 child: Icon(
                   Icons.logout,
-                  color: Color(0xff821131),
+                  color: Color(0xFF2F5233), // สีเขียวเข้ม
                   size: 30,
                 ),
               ),
