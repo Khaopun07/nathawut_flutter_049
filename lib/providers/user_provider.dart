@@ -1,32 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:natthawut_flutter_049/models/user_model.dart';
 
-class UserProvider extends ChangeNotifier {
-  
-  User? _user;
+class UserProvider with ChangeNotifier {
   String? _accessToken;
   String? _refreshToken;
 
-  User get user => _user!;
-  String get accessToken => _accessToken!;
-  String get refreshToken => _refreshToken!;
+  String? get accessToken => _accessToken;
+  String? get refreshToken => _refreshToken;
 
-  void onLogin(UserModel userModel) {
-    _user = userModel.user;
-    _accessToken = userModel.accessToken;
-    _refreshToken = userModel.refreshToken;
+  void updateAccessToken(String token) {
+    _accessToken = token;
     notifyListeners();
   }
 
-  void onLogout(){
-    _user = null;
+  void updateRefreshToken(String token) {
+    _refreshToken = token;
+    notifyListeners();
+  }
+
+  // logout
+  void onLogout() {
     _accessToken = null;
     _refreshToken = null;
-    notifyListeners();
-  }
-
-  void updateAccessToken(String newAccessToken) {
-    _accessToken = newAccessToken;
     notifyListeners();
   }
 }

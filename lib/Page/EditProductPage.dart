@@ -1,39 +1,58 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:natthawut_flutter_049/Widget/customCliper.dart'; // Assuming you already have customClipper
+import 'package:natthawut_flutter_049/controllers/product_controller.dart';
+import 'package:natthawut_flutter_049/models/product_model.dart';
 
 class EditProductPage extends StatefulWidget {
+  final ProductModel product; // Receive ProductModel to edit
+
+  const EditProductPage({Key? key, required this.product}) : super(key: key);
+
   @override
   _EditProductPageState createState() => _EditProductPageState();
 }
 
 class _EditProductPageState extends State<EditProductPage> {
   final _formKey = GlobalKey<FormState>();
-
-  late TextEditingController productNameController;
-  late TextEditingController productTypeController;
-  late TextEditingController priceController;
-  late TextEditingController unitController;
+  late String productName;
+  late String productType;
+  late double price;
+  late String unit;
 
   @override
   void initState() {
     super.initState();
-
-    // Initialize controllers with default values
-    productNameController = TextEditingController(text: 'คอมพิวเตอร์');
-    productTypeController = TextEditingController(text: 'เครื่องใช้ไฟฟ้า');
-    priceController = TextEditingController(text: '800');
-    unitController = TextEditingController(text: 'บาท');
+    // Get data from ProductModel to display in the form
+    productName = widget.product.productName;
+    productType = widget.product.productType;
+    price = widget.product.price.toDouble(); // Convert int to double
+    unit = widget.product.unit;
   }
 
-  @override
-  void dispose() {
-    // Dispose of controllers when the screen is disposed
-    productNameController.dispose();
-    productTypeController.dispose();
-    priceController.dispose();
-    unitController.dispose();
-    super.dispose();
+  // Function to update the product
+  Future<void> _updateProduct(BuildContext context, String productId) async {
+    final productController = ProductController();
+    try {
+      await productController.updateProduct(
+        context,
+        productId,
+        productName,
+        productType,
+        price,
+        unit,
+      );
+      // If the update is successful, navigate back to the previous screen
+      Navigator.pushReplacementNamed(context, '/admin');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Product updated successfully')),
+      );
+    } catch (error) {
+      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating product: $error')),
+      );
+    }
   }
 
   @override
@@ -44,12 +63,18 @@ class _EditProductPageState extends State<EditProductPage> {
     return Scaffold(
       body: Container(
         height: height,
-        color: Color(0xFFA2D5AB), // สีพื้นหลังธีมเขียว
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xffE0F2E9), Color(0xffA5D6A7)], // Green gradient background
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
         child: Stack(
           children: [
             // Background
             Positioned(
-              top: -height * .15,
+              top: -height * .1,
               right: -width * .4,
               child: Transform.rotate(
                 angle: -pi / 3.5,
@@ -58,16 +83,14 @@ class _EditProductPageState extends State<EditProductPage> {
                   child: Container(
                     height: height * .5,
                     width: width,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Color(0xFFA2D5AB), // สีเขียวหลัก
-                          Color(0xFF2F5233), // สีเขียวเข้ม
-                        ],
-                      ),
-                    ),
+                    // decoration: BoxDecoration(
+                    //   gradient: LinearGradient(
+                    //     colors: [
+                    //       Color(0xffA5D6A7),
+                    //       Color(0xff388E3C),
+                    //     ],
+                    //   ),
+                    // ),
                   ),
                 ),
               ),
@@ -86,15 +109,13 @@ class _EditProductPageState extends State<EditProductPage> {
                         style: TextStyle(
                           fontSize: 35,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF2F5233), // สีเขียวเข้ม
+                          color: Color(0xff4A7C0E), // Dark green color
                         ),
                         children: [
                           TextSpan(
-                            text: 'สินค้า',
+                            text: ' ข้อมูลสินค้า',
                             style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 35,
-                            ),
+                                color: Color(0xff1B5E20), fontSize: 35), // Darker green color
                           ),
                         ],
                       ),
@@ -105,50 +126,83 @@ class _EditProductPageState extends State<EditProductPage> {
                       child: Column(
                         children: <Widget>[
                           _buildTextField(
-                            controller: productNameController,
                             label: 'ชื่อสินค้า',
+                            initialValue: productName,
+                            onSaved: (value) => productName = value!,
                           ),
                           SizedBox(height: 16),
                           _buildTextField(
-                            controller: productTypeController,
                             label: 'ประเภทสินค้า',
+                            initialValue: productType,
+                            onSaved: (value) => productType = value!,
                           ),
                           SizedBox(height: 16),
                           _buildTextField(
-                            controller: priceController,
                             label: 'ราคา',
+                            initialValue: price.toString(),
                             keyboardType: TextInputType.number,
+                            onSaved: (value) => price = double.parse(value!),
                           ),
                           SizedBox(height: 16),
                           _buildTextField(
-                            controller: unitController,
                             label: 'หน่วย',
+                            initialValue: unit,
+                            onSaved: (value) => unit = value!,
                           ),
                           SizedBox(height: 30),
-                          ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                _formKey.currentState!.save();
-                                // Save the updated product data
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF2F5233), // สีเขียวเข้ม
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24.0, vertical: 12.0),
-                              child: Text(
-                                'บันทึกการแก้ไข',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  if (_formKey.currentState!.validate()) {
+                                    _formKey.currentState!.save();
+                                    // Call the update function
+                                    _updateProduct(context, widget.product.id);
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xff4CAF50), // Green color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24.0, vertical: 12.0),
+                                  child: Text(
+                                    'แก้ไข',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pushReplacementNamed(context,
+                                      '/admin'); // Navigate to the product display page
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color.fromRGBO(103, 103, 103, 1),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24.0, vertical: 12.0),
+                                  child: Text(
+                                    'ยกเลิก',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
                         ],
                       ),
@@ -163,40 +217,25 @@ class _EditProductPageState extends State<EditProductPage> {
     );
   }
 
+  // Function to create TextField for the product edit form
   Widget _buildTextField({
-    required TextEditingController controller,
     required String label,
+    required String initialValue,
     TextInputType? keyboardType,
+    required FormFieldSetter<String> onSaved,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 6,
-            offset: Offset(0, 2), // Shadow position
-          ),
-        ],
-      ),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          filled: true,
-          fillColor: Colors.transparent,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none,
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.black54), // Label color
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.green), // Border color
         ),
-        keyboardType: keyboardType,
-        onSaved: (value) {
-          controller.text = value!;
-        },
       ),
+      initialValue: initialValue,
+      keyboardType: keyboardType,
+      onSaved: onSaved,
     );
   }
 }

@@ -1,35 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 
 class ClipPainter extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
-    var height = size.height;
-    var width = size.width;
-    var path = new Path();
+    var path = Path();
 
+    // Starting point at the bottom left
     path.lineTo(0, size.height);
-    path.lineTo(size.width, height);
+
+    // Bottom right corner
+    path.lineTo(size.width, size.height);
+
+    // Right edge to the top right corner
     path.lineTo(size.width, 0);
 
-    /// [Top Left corner]
-    var secondControlPoint = Offset(0, 0);
-    var secondEndPoint = Offset(width * .2, height * .3);
-    path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
-        secondEndPoint.dx, secondEndPoint.dy);
+    // Top left corner curve
+    var firstControlPoint = Offset(0, 0);
+    var firstEndPoint = Offset(size.width * 0.2, size.height * 0.3);
+    path.quadraticBezierTo(
+      firstControlPoint.dx,
+      firstControlPoint.dy,
+      firstEndPoint.dx,
+      firstEndPoint.dy,
+    );
 
-    /// [Left Middle]
-    var fifthControlPoint = Offset(width * .3, height * .5);
-    var fiftEndPoint = Offset(width * .23, height * .6);
-    path.quadraticBezierTo(fifthControlPoint.dx, fifthControlPoint.dy,
-        fiftEndPoint.dx, fiftEndPoint.dy);
+    // Left middle curve
+    var secondControlPoint = Offset(size.width * 0.25, size.height * 0.5);
+    var secondEndPoint = Offset(size.width * 0.1, size.height * 0.7);
+    path.quadraticBezierTo(
+      secondControlPoint.dx,
+      secondControlPoint.dy,
+      secondEndPoint.dx,
+      secondEndPoint.dy,
+    );
 
-    /// [Bottom Left corner]
-    var thirdControlPoint = Offset(0, height);
-    var thirdEndPoint = Offset(width, height);
-    path.quadraticBezierTo(thirdControlPoint.dx, thirdControlPoint.dy,
-        thirdEndPoint.dx, thirdEndPoint.dy);
+    // Bottom left corner curve
+    var thirdControlPoint = Offset(0, size.height);
+    var thirdEndPoint = Offset(size.width * 0.5, size.height);
+    path.quadraticBezierTo(
+      thirdControlPoint.dx,
+      thirdControlPoint.dy,
+      thirdEndPoint.dx,
+      thirdEndPoint.dy,
+    );
 
+    // Complete the path by returning to the bottom left
     path.lineTo(0, size.height);
     path.close();
 
@@ -38,7 +53,6 @@ class ClipPainter extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) {
-    // TODO: implement shouldReclip
-    return true;
+    return true; // Reclip on every rebuild
   }
 }

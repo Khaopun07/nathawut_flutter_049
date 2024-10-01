@@ -1,8 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:natthawut_flutter_049/Page/EditProductPage.dart';
 import 'dart:math';
+import 'package:natthawut_flutter_049/Widget/customCliper.dart';
+import 'package:natthawut_flutter_049/controllers/auth_controller.dart';
+import 'package:natthawut_flutter_049/models/user_model.dart';
+import 'package:natthawut_flutter_049/providers/user_provider.dart';
+import 'package:natthawut_flutter_049/models/product_model.dart';
+import 'package:natthawut_flutter_049/controllers/product_controller.dart';
+import 'package:provider/provider.dart';
 
 class HomeAdmin extends StatefulWidget {
   const HomeAdmin({super.key});
@@ -12,9 +18,9 @@ class HomeAdmin extends StatefulWidget {
 }
 
 class _HomeAdminState extends State<HomeAdmin> {
-  List<Map<String, dynamic>> _products = []; // Initialize _products
-  bool _isLoading = true; // Initialize loading state
-  final String _apiUrl = 'http://10.0.2.2:3000/api/products'; // Define your API URL here
+  List<ProductModel> products = [];
+  bool isLoading = true;
+  String? errorMessage;
 
   @override
   void initState() {
@@ -22,75 +28,10 @@ class _HomeAdminState extends State<HomeAdmin> {
     _fetchProducts();
   }
 
-  Future<void> _fetchProducts() async {
-    try {
-      final response = await http.get(Uri.parse(_apiUrl)); // Fetch products from API
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        setState(() {
-          _products = List<Map<String, dynamic>>.from(data);
-        });
-      } else {
-        _handleError('Failed to load products: ${response.statusCode}');
-      }
-    } catch (e) {
-      _handleError('Error fetching products: $e');
-    } finally {
-      // Set _isLoading to false regardless of the outcome
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _deleteProduct(String productId) async {
-    try {
-      final response = await http.delete(Uri.parse('$_apiUrl/$productId'));
-      if (response.statusCode == 200) {
-        setState(() {
-          _products.removeWhere((product) => product['id'].toString() == productId);
-        });
-      } else {
-        _handleError('Failed to delete product: ${response.statusCode}');
-      }
-    } catch (e) {
-      _handleError('Error deleting product: $e');
-    }
-  }
-
-  void _handleError(String message) {
-    setState(() {
-      _isLoading = false;
-    });
-    _showErrorDialog(message);
-  }
-
-  void _showErrorDialog(String message) {
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Error'),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   Future<void> _showLogoutConfirmationDialog(BuildContext context) async {
-    showDialog<void>(
+    return showDialog<void>(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: false, // user must tap button to dismiss
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('ยืนยันการออกจากระบบ'),
@@ -99,14 +40,16 @@ class _HomeAdminState extends State<HomeAdmin> {
             TextButton(
               child: const Text('ยกเลิก'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // close the dialog
               },
             ),
             TextButton(
               child: const Text('ออกจากระบบ'),
               onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.popAndPushNamed(context, '/login');
+                Provider.of<UserProvider>(context, listen: false)
+                    .onLogout(); // เรียกฟังก์ชัน logout จาก controller
+
+                Navigator.pushReplacementNamed(context, '/login');
               },
             ),
           ],
@@ -115,41 +58,114 @@ class _HomeAdminState extends State<HomeAdmin> {
     );
   }
 
+  Future<void> _fetchProducts() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    try {
+      final productList = await ProductController().getProducts(context);
+      setState(() {
+        products = productList;
+        isLoading = false;
+      });
+    } catch (error) {
+      setState(() {
+        errorMessage = 'Error fetching products: $error';
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error fetching products: $error')));
+    }
+  }
+
+  // ฟังก์ชันสำหรับการแก้ไขสินค้า
+  void updateProduct(ProductModel product) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EditProductPage(product: product),
+      ),
+    );
+  }
+
+  Future<void> deleteProduct(ProductModel product) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // แสดงกล่องยืนยันก่อนทำการลบ
+    final confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('ยืนยันการลบสินค้า'),
+          content: const Text('คุณแน่ใจหรือไม่ว่าต้องการลบสินค้านี้?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('ยกเลิก'),
+              onPressed: () {
+                Navigator.of(context).pop(false); // ปิดกล่องและส่งค่ากลับ false
+              },
+            ),
+            TextButton(
+              child: const Text('ลบ'),
+              onPressed: () {
+                Navigator.of(context).pop(true); // ปิดกล่องและส่งค่ากลับ true
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    // ถ้าผู้ใช้ยืนยันการลบ
+    if (confirmDelete == true) {
+      try {
+        await ProductController().deleteProduct(context, product.id);
+        // เรียกใช้งาน _fetchProducts เพื่อดึงข้อมูลสินค้าใหม่
+        await _fetchProducts();
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('ลบสินค้าสำเร็จ')));
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error deleting product: $error')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 214, 255, 236),
       body: Container(
         height: height,
-        color: const Color(0xFFA2D5AB),
         child: Stack(
           children: [
+            // Background
             Positioned(
-              top: -height * .15,
+              top: -height * .1,
               right: -width * .4,
               child: Transform.rotate(
                 angle: -pi / 3.5,
                 child: ClipPath(
+                  clipper: ClipPainter(),
                   child: Container(
                     height: height * .5,
                     width: width,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          const Color(0xFFA2D5AB),
-                          const Color(0xFF2F5233),
-                        ],
-                      ),
-                    ),
+                    // decoration: BoxDecoration(
+                    //   gradient: LinearGradient(
+                    //     begin: Alignment.topLeft,
+                    //     end: Alignment.bottomRight,
+                    //     colors: [
+                    //       Color(0xff0072ff), // Light Blue
+                    //       Color(0xff00c6ff), // Dark Blue
+                    //     ],
+                    //   ),
+                    // ),
                   ),
                 ),
               ),
             ),
-            Container(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: SingleChildScrollView(
                 child: Column(
@@ -160,128 +176,66 @@ class _HomeAdminState extends State<HomeAdmin> {
                       textAlign: TextAlign.center,
                       text: TextSpan(
                         text: 'จัดการ',
-                        style: const TextStyle(
-                          fontSize: 35,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF2F5233),
-                        ),
+                        style: TextStyle(
+                            fontSize: 35,
+                            fontWeight: FontWeight.w900,
+                            color: Color.fromARGB(158, 63, 192, 12)),
                         children: [
-                          const TextSpan(
+                          TextSpan(
                             text: 'สินค้า',
-                            style: TextStyle(color: Colors.black, fontSize: 35),
+                            style: TextStyle(
+                                color: Color.fromARGB(255, 6, 119, 44), fontSize: 35),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
+                    Consumer<UserProvider>(
+                      builder: (context, userProvider, _) {
+                        return Column(
+                          children: [
+                            _buildTokenInfo('Access Token:',
+                                userProvider.accessToken, Color(0xff821131)),
+                            _buildTokenInfo('Refresh Token:',
+                                userProvider.refreshToken, Color(0xffFABC3F)),
+                            SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: () {
+                                AuthController().refreshToken(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color.fromARGB(255, 4, 82, 30),
+                              ),
+                              child: Text('Update Token',
+                                  style: TextStyle(color: Colors.white)),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.pushNamed(context, '/add_product');
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2F5233),
+                        backgroundColor: Color.fromARGB(255, 17, 68, 47),
                       ),
-                      child: const Text(
-                        'เพิ่มสินค้าใหม่',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                      child: Text('เพิ่มสินค้าใหม่',
+                          style: TextStyle(color: Colors.white)),
                     ),
-                    const SizedBox(height: 20),
-                    if (_isLoading)
-                      const Center(child: CircularProgressIndicator())
-                    else if (_products.isEmpty)
-                      const Center(
-                        child: Text(
-                          'ไม่มีสินค้าสำหรับแสดง',
-                          style: TextStyle(fontSize: 18, color: Colors.black),
-                        ),
-                      )
+                    SizedBox(height: 20),
+                    if (isLoading)
+                      CircularProgressIndicator()
+                    else if (errorMessage != null)
+                      Text(errorMessage!, style: TextStyle(color: Colors.red))
                     else
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: _products.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            padding: const EdgeInsets.all(8.0),
-                            decoration: const BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  color: Color(0xFFE5E5E5),
-                                  width: 1.0,
-                                ),
-                              ),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        _products[index]['product_name'] ?? 'Unknown Product',
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF2F5233),
-                                        ),
-                                      ),
-                                      Text(
-                                        'ประเภท: ${_products[index]['product_type'] ?? 'N/A'}',
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                      Text(
-                                        'ราคา: \$${_products[index]['price'] ?? 'N/A'}',
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                      Text(
-                                        'หน่วย: ${_products[index]['unit'] ?? 'N/A'}',
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                      Text(
-                                        'สร้างเมื่อ: ${_products[index]['createdAt'] ?? 'N/A'}',
-                                        style: const TextStyle(fontSize: 12),
-                                      ),
-                                      Text(
-                                        'แก้ไขล่าสุด: ${_products[index]['updatedAt'] ?? 'N/A'}',
-                                        style: const TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.edit,
-                                    color: Color(0xFF2F5233),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/edit_product',
-                                      arguments: _products[index],
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () {
-                                    _showDeleteConfirmationDialog(context,
-                                        _products[index]['id'].toString());
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                      _buildProductList(),
                   ],
                 ),
               ),
             ),
+            // LogOut Button
             Positioned(
               top: 50.0,
               right: 16.0,
@@ -290,11 +244,7 @@ class _HomeAdminState extends State<HomeAdmin> {
                 onTap: () {
                   _showLogoutConfirmationDialog(context);
                 },
-                child: const Icon(
-                  Icons.logout,
-                  color: Color(0xFF2F5233),
-                  size: 30,
-                ),
+                child: Icon(Icons.logout, color: Color(0xff821131), size: 30),
               ),
             ),
           ],
@@ -303,29 +253,84 @@ class _HomeAdminState extends State<HomeAdmin> {
     );
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context, String productId) {
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('ยืนยันการลบสินค้า'),
-          content: const Text('คุณแน่ใจหรือไม่ว่าต้องการลบสินค้านี้?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('ยกเลิก'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('ลบสินค้า'),
-              onPressed: () async {
-                await _deleteProduct(productId);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+  Widget _buildTokenInfo(String title, String? token, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title,
+            style: TextStyle(
+                fontSize: 18,
+                color: Colors.black,
+                fontWeight: FontWeight.bold)),
+        SizedBox(height: 5),
+        Text(
+          token ?? 'N/A',
+          style: TextStyle(fontSize: 16, color: color),
+        ),
+        SizedBox(height: 15),
+      ],
+    );
+  }
+
+  Widget _buildProductList() {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        final product = products[index];
+        return Container(
+          margin: EdgeInsets.symmetric(vertical: 5),
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  blurRadius: 5,
+                  spreadRadius: 1),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(product.productName,
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xffC7253E))),
+                    SizedBox(height: 5),
+                    Text('ประเภท: ${product.productType}',
+                        style:
+                            TextStyle(fontSize: 14, color: Color(0xffE85C0D))),
+                    Text('ราคา: \$${product.price}',
+                        style:
+                            TextStyle(fontSize: 14, color: Color(0xff821131))),
+                    Text('หน่วย: ${product.unit}',
+                        style:
+                            TextStyle(fontSize: 14, color: Color(0xffFABC3F))),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.edit, color: Color(0xffFABC3F)),
+                onPressed: () {
+                  updateProduct(product);
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.delete, color: Color(0xff821131)),
+                onPressed: () {
+                  deleteProduct(product);
+                },
+              ),
+            ],
+          ),
         );
       },
     );
