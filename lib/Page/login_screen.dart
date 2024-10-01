@@ -75,7 +75,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(
+<<<<<<< HEAD
                           text: 'Ka',
+=======
+                          text: 'K',
+>>>>>>> d260809a2dada486c266bbb0f0aec674f6739812
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w700,

@@ -2,8 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:natthawut_flutter_049/Widget/customCliper.dart';
-import 'package:natthawut_flutter_049/providers/user_provider.dart';
-import 'package:natthawut_flutter_049/providers/product_provider.dart';
 
 class HomeAdmin extends StatelessWidget {
   const HomeAdmin({super.key});

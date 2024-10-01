@@ -22,10 +22,10 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         initialRoute: '/login',
         routes: {
-          '/home': (context) => HomeScreen(),
-          '/login': (context) => LoginScreen(),
-          '/register': (context) => RegisterPage(),
-          '/admin': (context) => HomeAdmin(),
+          '/home': (context) =>  const HomeScreen(),
+          '/login': (context) => const LoginScreen(),
+          '/register': (context) => const RegisterPage(),
+          '/admin': (context) => const HomeAdmin(),
           '/add_product': (context) => AddProductPage(),
           '/edit_product': (context) => EditProductPage(),
         });
