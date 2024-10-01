@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mongo_lab1/Page/login_screen.dart';
-import 'package:flutter_mongo_lab1/Widget/customCliper.dart';
+import 'package:natthawut_flutter_049/Page/login_screen.dart';
+import 'package:natthawut_flutter_049/Widget/customCliper.dart';
 import 'dart:math';
-import 'package:flutter_mongo_lab1/controllers/auth_controller.dart';
+import 'package:natthawut_flutter_049/controllers/auth_controller.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -15,15 +15,15 @@ class _RegisterPage extends State<RegisterPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController roleController = TextEditingController();
+  String? selectedRole;
   final _formKey = GlobalKey<FormState>();
 
   void _register() async {
     if (_formKey.currentState!.validate()) {
       print('Username : ${usernameController.text}');
       print('Password : ${passwordController.text}');
-      print('name : ${nameController.text}');
-      print('role : ${roleController.text}');
+      print('Name : ${nameController.text}');
+      print('Role : $selectedRole');
 
       try {
         final user = await AuthController().register(
@@ -31,7 +31,7 @@ class _RegisterPage extends State<RegisterPage> {
           usernameController.text,
           passwordController.text,
           nameController.text,
-          roleController.text,
+          selectedRole ?? '', // Use selectedRole with a fallback
         );
       } catch (e) {
         print(e);
@@ -45,6 +45,7 @@ class _RegisterPage extends State<RegisterPage> {
     return Scaffold(
       body: Container(
         height: height,
+        color: Color(0xFFA2D5AB), // Change background color to green theme
         child: Stack(
           children: <Widget>[
             Positioned(
@@ -63,8 +64,8 @@ class _RegisterPage extends State<RegisterPage> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            Color(0xffE6E6E6),
-                            Color(0xff14279B),
+                            Color(0xFFA2D5AB), // Adjusted background gradient
+                            Color(0xFFA2D5AB),
                           ],
                         ),
                       ),
@@ -86,11 +87,11 @@ class _RegisterPage extends State<RegisterPage> {
                       RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(
-                          text: 'T-Dat',
+                          text: 'khaopun',
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xff14279B),
+                            color: Color(0xFF2F5233), // Dark green text
                           ),
                           children: [
                             TextSpan(
@@ -112,7 +113,9 @@ class _RegisterPage extends State<RegisterPage> {
                                   "Username",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 15),
+                                      fontSize: 15,
+                                      color: Color(0xFF2F5233) // Dark green
+                                  ),
                                 ),
                                 SizedBox(height: 10),
                                 TextFormField(
@@ -141,7 +144,9 @@ class _RegisterPage extends State<RegisterPage> {
                                   "Password",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 15),
+                                      fontSize: 15,
+                                      color: Color(0xFF2F5233) // Dark green
+                                  ),
                                 ),
                                 SizedBox(height: 10),
                                 TextFormField(
@@ -170,7 +175,9 @@ class _RegisterPage extends State<RegisterPage> {
                                   "Name",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 15),
+                                      fontSize: 15,
+                                      color: Color(0xFF2F5233) // Dark green
+                                  ),
                                 ),
                                 SizedBox(height: 10),
                                 TextFormField(
@@ -199,19 +206,29 @@ class _RegisterPage extends State<RegisterPage> {
                                   "Role",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 15),
+                                      fontSize: 15,
+                                      color: Color(0xFF2F5233) // Dark green
+                                  ),
                                 ),
                                 SizedBox(height: 10),
-                                TextFormField(
-                                  controller: roleController,
-                                  obscureText: false,
+                                DropdownButtonFormField<String>(
+                                  value: selectedRole,
+                                  items: [
+                                    DropdownMenuItem(value: 'admin', child: Text('Admin')),
+                                    DropdownMenuItem(value: 'user', child: Text('User')),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedRole = value;
+                                    });
+                                  },
                                   decoration: InputDecoration(
                                       border: InputBorder.none,
                                       fillColor: Color(0xfff3f3f4),
                                       filled: true),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Please enter your role';
+                                      return 'Please select your role';
                                     }
                                     return null;
                                   },
@@ -237,14 +254,7 @@ class _RegisterPage extends State<RegisterPage> {
                                   blurRadius: 5,
                                   spreadRadius: 2)
                             ],
-                            gradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                Color(0xff14279B),
-                                Color(0xff14279B),
-                              ],
-                            ),
+                            color: Color(0xFF2F5233), // Solid green button
                           ),
                           child: Text(
                             'Register Now',
@@ -270,13 +280,16 @@ class _RegisterPage extends State<RegisterPage> {
                               Text(
                                 'Already have an account ?',
                                 style: TextStyle(
-                                    fontSize: 13, fontWeight: FontWeight.w600),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF2F5233) // Dark green
+                                ),
                               ),
                               SizedBox(width: 10),
                               Text(
                                 'Login',
                                 style: TextStyle(
-                                    color: Color(0xff14279B),
+                                    color: Color(0xFF2F5233), // Dark green
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600),
                               ),

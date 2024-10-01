@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'package:flutter_mongo_lab1/Widget/customCliper.dart'; // Assuming you already have customClipper
+import 'package:natthawut_flutter_049/Widget/customCliper.dart'; // Assuming you already have customClipper
 
 class AddProductPage extends StatefulWidget {
   @override
@@ -22,6 +22,7 @@ class _AddProductPageState extends State<AddProductPage> {
     return Scaffold(
       body: Container(
         height: height,
+        color: Color(0xFFA2D5AB), // พื้นหลังสีเขียวหลัก
         child: Stack(
           children: [
             // Background
@@ -40,8 +41,8 @@ class _AddProductPageState extends State<AddProductPage> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Color(0xffE9EFEC),
-                          Color(0xffFABC3F),
+                          Color(0xFFA2D5AB), // สีเขียวหลัก
+                          Color(0xFF2F5233), // สีเขียวเข้ม
                         ],
                       ),
                     ),
@@ -63,13 +64,15 @@ class _AddProductPageState extends State<AddProductPage> {
                         style: TextStyle(
                           fontSize: 35,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xffC7253E),
+                          color: Color(0xFF2F5233), // สีเขียวเข้ม
                         ),
                         children: [
                           TextSpan(
                             text: 'สินค้าใหม่',
                             style: TextStyle(
-                                color: Color(0xffE85C0D), fontSize: 35),
+                              color: Colors.black,
+                              fontSize: 35,
+                            ),
                           ),
                         ],
                       ),
@@ -143,7 +146,7 @@ class _AddProductPageState extends State<AddProductPage> {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xff821131),
+                              backgroundColor: Color(0xFF2F5233), // สีเขียวเข้ม
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),

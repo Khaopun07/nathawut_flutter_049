@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mongo_lab1/Page/AddProductPage.dart';
-import 'package:flutter_mongo_lab1/Page/EditProductPage.dart';
-import 'package:flutter_mongo_lab1/Page/home_admin.dart';
+import 'package:natthawut_flutter_049/Page/AddProductPage.dart';
+import 'package:natthawut_flutter_049/Page/EditProductPage.dart';
+import 'package:natthawut_flutter_049/Page/home_admin.dart';
 
-import 'package:flutter_mongo_lab1/Page/home_screen.dart';
-import 'package:flutter_mongo_lab1/Page/login_screen.dart';
-import 'package:flutter_mongo_lab1/Page/register.dart';
+import 'package:natthawut_flutter_049/Page/home_screen.dart';
+import 'package:natthawut_flutter_049/Page/login_screen.dart';
+import 'package:natthawut_flutter_049/Page/register.dart';
 
 void main() {
   runApp(MyApp());
