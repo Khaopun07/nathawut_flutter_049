@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:natthawut_flutter_049/models/product_model.dart';
-import 'package:natthawut_flutter_049/controllers/product_controller.dart';
 
-class ProductProvider with ChangeNotifier {
-  final ProductController _productController = ProductController();
+class ProductProvider extends ChangeNotifier {
   List<ProductModel> _products = [];
   bool _isLoading = false;
   String? _errorMessage;
@@ -12,19 +10,44 @@ class ProductProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  Future<void> fetchProducts() async {
+  void loadProducts() async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
-      _products = await _productController.getProducts();
-      _errorMessage = null; // Clear previous errors
-    } catch (e) {
-      _errorMessage = e.toString();
-      _products = [];
+      // สมมุติว่าคุณมีฟังก์ชัน fetchProducts ที่ดึงข้อมูลผลิตภัณฑ์จาก API
+      _products = await fetchProducts();
+    } catch (error) {
+      _errorMessage = error.toString();
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
+
+  void addProduct(ProductModel product) {
+    _products.add(product);
+    notifyListeners();
+  }
+
+  void removeProduct(ProductModel product) {
+    _products.remove(product);
+    notifyListeners();
+  }
+
+  void updateProduct(ProductModel updatedProduct) {
+    final index = _products.indexWhere((p) => p.id == updatedProduct.id);
+    if (index != -1) {
+      _products[index] = updatedProduct;
+      notifyListeners();
+    }
+  }
+}
+
+// สมมุติว่ามีฟังก์ชัน fetchProducts ที่จะทำการดึงข้อมูลผลิตภัณฑ์จาก API
+Future<List<ProductModel>> fetchProducts() async {
+  // ทำการดึงข้อมูลผลิตภัณฑ์ที่นี่
+  // ตัวอย่างนี้จะคืนค่ารายการผลิตภัณฑ์ว่าง ๆ
+  return [];
 }

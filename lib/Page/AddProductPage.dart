@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:natthawut_flutter_049/Widget/customCliper.dart'; // Assuming you already have customClipper
+import 'package:natthawut_flutter_049/controllers/product_controller.dart'; // Import your ProductController
+import 'package:natthawut_flutter_049/models/product_model.dart'; // Import your ProductModel
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddProductPage extends StatefulWidget {
   @override
@@ -13,6 +16,7 @@ class _AddProductPageState extends State<AddProductPage> {
   String productType = '';
   int price = 0;
   String unit = '';
+  final ProductController _productController = ProductController(); // Instantiate ProductController
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +26,7 @@ class _AddProductPageState extends State<AddProductPage> {
     return Scaffold(
       body: Container(
         height: height,
-        color: Color(0xFFA2D5AB), // พื้นหลังสีเขียวหลัก
+        color: Color(0xFFA2D5AB), // Background color
         child: Stack(
           children: [
             // Background
@@ -41,8 +45,8 @@ class _AddProductPageState extends State<AddProductPage> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Color(0xFFA2D5AB), // สีเขียวหลัก
-                          Color(0xFF2F5233), // สีเขียวเข้ม
+                          Color(0xFFA2D5AB), // Light green
+                          Color(0xFF2F5233), // Dark green
                         ],
                       ),
                     ),
@@ -64,7 +68,7 @@ class _AddProductPageState extends State<AddProductPage> {
                         style: TextStyle(
                           fontSize: 35,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF2F5233), // สีเขียวเข้ม
+                          color: Color(0xFF2F5233), // Dark green
                         ),
                         children: [
                           TextSpan(
@@ -139,21 +143,46 @@ class _AddProductPageState extends State<AddProductPage> {
                           ),
                           SizedBox(height: 30),
                           ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
                               if (_formKey.currentState!.validate()) {
                                 _formKey.currentState!.save();
-                                // บันทึกข้อมูลสินค้าใหม่
+                                // Get the access token from shared preferences
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                String? accessToken = prefs.getString('accessToken');
+
+                                // Create a new product model
+                                ProductModel newProduct = ProductModel(
+                                  productName: productName,
+                                  productType: productType,
+                                  price: price,
+                                  unit: unit,
+                                );
+
+                                try {
+                                  // Call the addProduct method
+                                  await _productController.addProduct(accessToken!, newProduct);
+                                  // Show success message
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('สินค้าใหม่ถูกเพิ่มเรียบร้อยแล้ว')),
+                                  );
+                                  // Optionally, you can clear the form here
+                                  _formKey.currentState!.reset();
+                                } catch (e) {
+                                  // Show error message
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('เกิดข้อผิดพลาดในการเพิ่มสินค้า: $e')),
+                                  );
+                                }
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF2F5233), // สีเขียวเข้ม
+                              backgroundColor: Color(0xFF2F5233), // Dark green
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24.0, vertical: 12.0),
+                              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
                               child: Text(
                                 'บันทึก',
                                 style: TextStyle(

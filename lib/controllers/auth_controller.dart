@@ -7,60 +7,59 @@ import 'package:http/http.dart' as http;
 class AuthController {
   // Function to save tokens in SharedPreferences
   Future<void> _saveTokens(String accessToken, String refreshToken) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('accessToken', accessToken);
     await prefs.setString('refreshToken', refreshToken);
   }
 
   // Function to get access token
   Future<String?> getAccessToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('accessToken');
   }
 
   // Function to get refresh token
   Future<String?> getRefreshToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('refreshToken');
   }
 
-  Future<void> login(
-      BuildContext context, String username, String password) async {
-    print(apiURL);
+  Future<void> login(BuildContext context, String username, String password) async {
+    print('API URL: $apiURL');
 
-    final response = await http.post(Uri.parse("$apiURL/api/auth/login"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(
-          {
-            "username": username,
-            "password": password,
-          },
-        ));
-    print(response.statusCode);
+    final response = await http.post(
+      Uri.parse("$apiURL/api/auth/login"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"username": username, "password": password}),
+    );
+
+    print('Response status code: ${response.statusCode}');
+    
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
       String accessToken = data['accessToken'];
       String refreshToken = data['refreshToken'];
       String role = data['user']['role'];
 
-      print("accessToken :" + accessToken);
-      print("refreshToken :" + refreshToken);
-      print("role :" + role);
+      print("Access Token: $accessToken");
+      print("Refresh Token: $refreshToken");
+      print("Role: $role");
+
       // Save tokens to SharedPreferences
       await _saveTokens(accessToken, refreshToken);
 
+      // Navigate based on role
       if (role == 'admin') {
         Navigator.pushReplacementNamed(context, '/admin');
       } else {
         Navigator.pushReplacementNamed(context, '/home');
       }
     } else {
-      print('Login failed');
+      print('Login failed: ${response.body}');
     }
   }
 
-  Future<void> register(BuildContext context, String username, String password,
-      String name, String role) async {
+  Future<void> register(BuildContext context, String username, String password, String name, String role) async {
     final Map<String, dynamic> registerData = {
       "username": username,
       "password": password,
@@ -73,18 +72,18 @@ class AuthController {
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(registerData),
     );
-    print(response.statusCode);
+
+    print('Response status code: ${response.statusCode}');
 
     if (response.statusCode == 201) {
       Navigator.pushReplacementNamed(context, '/login');
     } else {
-      print('Registration failed');
+      print('Registration failed: ${response.body}');
     }
   }
 
-  // Function to logout (optional)
   Future<void> logout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('accessToken');
     await prefs.remove('refreshToken');
   }
